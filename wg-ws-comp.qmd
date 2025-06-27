@@ -1,0 +1,31 @@
+---
+title: "Estimating error associated with analyzing an aggregate dataset containing WG and WS CDI forms"
+author: "Chris Cox"
+format: html
+editor: visual
+---
+
+## The problem
+
+The CDI has multiple versions, each designed for use with children at different developmental stages. In particular, the form tailored for children at the earliest stages of language development (Form 1, Words and Gestures; WG) includes a vocabulary checklist consisting of 396 words (198 nouns, 56 verbs, 37 adjectives, 37 function words, and 67 "other"), while the checklist included with the next form (Form 2, Words and Sentences; WS) consists of 680 words (312 nouns, 103 verbs, 63 adjectives, 102 function words, and 100 "other"). Thus, comparing vocabulary size and composition of children assessed with WG and WS forms is may not be appropriate.
+
+## Considerations
+
+However, with some care toward how
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
