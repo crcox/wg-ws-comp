@@ -85,6 +85,12 @@ asd_cdi_counts <- asd_cdi |>
         names_prefix = "nproduced_",
         names_sep = "_",
         values_to = "nproduced"
+    ) |>
+    mutate(
+        wordtype = factor(
+            wordtype,
+            levels = c("noun", "verb", "adj", "func", "other", "total")
+        )
     )
 
 count_wordtype_wg <- meta |>
@@ -119,19 +125,173 @@ count_wordtype <- bind_rows(
         )
     )
 
+count_wordtype_diff <- count_wordtype |>
+    pivot_wider(id_cols = wordtype, names_from = form, values_from = n) |>
+    mutate(wordtype_diff = WS-WG)
+
+asd_cdi_counts |>
+    filter(wordset == "ws") |>
+    left_join(rename(count_wordtype, wordtype_max = n)) |>
+    mutate(
+        nproduced = nproduced / wordtype_max
+    ) |>
+    ggplot(aes(x = nproduced, color = wordtype, size = wordtype)) +
+        geom_density() +
+        scale_size_manual(values = c(total = 2, noun = .7, verb = .7, adj = .7, func = .7, other = .7)) +
+        #stat_ecdf(geom = "step") +
+        facet_wrap(vars(form), scales = "free_x") +
+        theme_bw(base_size = 12)
+
 asd_cdi_counts |>
     filter(wordset == "ws") |>
     left_join(rename(count_wordtype, wordtype_max = n)) |>
     mutate(nproduced = nproduced / wordtype_max) |>
-    ggplot(aes(x = nproduced, color = wordtype)) +
-    geom_density() +
+    ggplot(aes(x = nproduced, fill = wordtype)) +
+    geom_histogram() +
     #stat_ecdf(geom = "step") +
-    facet_wrap(vars(form), scales = "free_x") +
-    theme_bw(base_size = 12)
+    facet_grid(wordtype ~ form, scales = "free_x") +
+    theme_bw(base_size = 12) +
+    theme(legend.position = "none")
+
+asd_cdi_counts |>
+    filter(wordset == "ws") |>
+    left_join(rename(count_wordtype, wordtype_max = n)) |>
+    mutate(nproduced = nproduced / wordtype_max) |>
+    ggplot(aes(x = nproduced, fill = wordtype)) +
+    geom_histogram(aes(y = after_stat(density))) +
+    facet_grid(wordtype ~ form, scales = "free_x") +
+    theme_bw(base_size = 12) +
+    theme(legend.position = "none")
+
+asd_cdi_counts |>
+    filter(wordset == "ws") |>
+    left_join(rename(count_wordtype, wordtype_max = n)) |>
+    ggplot(aes(x = nproduced, fill = wordtype)) +
+    geom_histogram() +
+    #stat_ecdf(geom = "step") +
+    facet_grid(wordtype ~ form, scales = "free_x") +
+    theme_bw(base_size = 12) +
+    theme(legend.position = "none")
+
+asd_cdi_counts |>
+    filter(wordset == "ws") |>
+    left_join(rename(count_wordtype, wordtype_max = n)) |>
+    ggplot(aes(x = nproduced, fill = wordtype)) +
+    geom_histogram(aes(y = after_stat(density))) +
+    facet_grid(wordtype ~ form, scales = "free_x") +
+    theme_bw(base_size = 12) +
+    theme(legend.position = "none")
 
 n_wg <- count_wordtype |>
     filter(form == "WG", wordtype == "total") |>
     pull(n)
+
+
+asd_cdi_counts |>
+    pivot_wider(
+        id_cols = c(subjectkey:form, wordtype),
+        names_from = wordset,
+        names_prefix = "n_",
+        values_from = nproduced
+    ) |>
+    left_join(rename(count_wordtype, wordtype_max = n)) |>
+    left_join(select(filter(count_wordtype, form == "WG"), wordtype, wordtype_max_wg = n)) |>
+    filter(
+        n_ws <= wordtype_max_wg,
+        form == "WS"
+    ) |>
+    ggplot(aes(x = n_wg, y = n_ws, color = wordtype)) +
+        geom_point(color = "darkgrey") +
+        geom_smooth(method = "gam") +
+        geom_abline(slope = 1, intercept = 0) +
+        facet_wrap(vars(wordtype), scales = "free") +
+        theme_bw() +
+        theme(legend.position = "none")
+
+asd_cdi_ws |>
+    filter(nproduced_ws <= n_wg) |>
+    ggplot(aes(x = nproduced_ws, y = nproduced_wg / nproduced_ws)) +
+    geom_point() +
+    geom_smooth() +
+    xlim(c(0, n_wg)) +
+    ylim(c(0, 1))
+
+
+tmp <- asd_cdi_counts |>
+    rename(n = nproduced, kde = kde_wg) |>
+    pivot_wider(
+        id_cols = c(subjectkey:form, wordtype),
+        names_from = wordset,
+        values_from = c(n, kde)
+    ) |>
+    left_join(rename(count_wordtype, wordtype_max = n)) |>
+    left_join(select(filter(count_wordtype, form == "WG"), wordtype, wordtype_max_wg = n)) |>
+    group_by(wordtype)
+
+models <- tmp |>
+    filter(
+        n_ws <= wordtype_max_wg,
+        form == "WS"
+    ) |>
+    group_split() |>
+    map(~ mgcv::gam(n_ws ~ n_wg, data = .x))
+
+names(models) <- tmp |> group_keys() |> pull(wordtype)
+
+asd_cdi_counts_wg <- asd_cdi_counts |>
+    filter(form == "WG", wordset == "wg") |>
+    select(-wordset) |>
+    group_by(wordtype) |>
+    mutate(
+        pred_wg_to_ws_raw = c(predict(models[[wordtype[1]]], tibble(n_wg = nproduced))),
+        pred_wg_to_ws = if_else(pred_wg_to_ws_raw < nproduced, nproduced, pred_wg_to_ws_raw),
+        pred_error = pred_wg_to_ws - nproduced
+    ) |>
+    left_join(select(count_wordtype_diff, wordtype, wordtype_diff, n_wg = WG)) |>
+    group_by(wordtype) |>
+    mutate(
+        pred_error_rate = pred_error / wordtype_diff,
+        pproduced = nproduced / n_wg
+    ) |>
+    ungroup()
+
+asd_cdi_counts_wg |>
+    left_join(select(count_wordtype_diff, wordtype, wordtype_diff)) |>
+    group_by(wordtype) |>
+    mutate(pred_error = pred_error / wordtype_diff) |>
+    ggplot(aes(x = pred_error, color = wordtype, size = wordtype)) +
+        geom_density() +
+        scale_size_manual(values = c(total = 2, noun = .7, verb = .7, adj = .7, func = .7, other = .7)) +
+        facet_wrap(vars(form)) +
+        theme_bw() +
+        xlab("Predicted Error Rate")
+
+asd_cdi_counts_wg |>
+    left_join(select(count_wordtype_diff, wordtype, wordtype_diff)) |>
+    group_by(wordtype) |>
+    mutate(pred_error = pred_error / wordtype_diff) |>
+    ggplot(aes(x = pred_error, color = wordtype, size = wordtype)) +
+        #geom_density() +
+        stat_ecdf(geom = "step") +
+        scale_size_manual(values = c(total = 2, noun = .7, verb = .7, adj = .7, func = .7, other = .7)) +
+        scale_y_continuous(breaks = seq(0,1,.2)) +
+        facet_wrap(vars(form)) +
+        theme_bw() +
+        xlab("Predicted Error Rate")
+
+asd_cdi_counts_wg |>
+    left_join(select(count_wordtype_diff, wordtype, wordtype_diff, n_wg = WG)) |>
+    group_by(wordtype) |>
+    mutate(
+        pred_error_rate = pred_error / wordtype_diff,
+        pproduced = nproduced / n_wg
+    ) |>
+    ggplot(aes(x = pproduced, y = pred_error_rate, color = wordtype)) +
+        geom_point() +
+        facet_wrap(vars(wordtype)) +
+        theme_bw() +
+        xlab("Proportion of Words Produced") +
+        ylab("Predicted Error Rate")
 
 
 kernal_density_estimate <- function(x, t, bw = bw.nrd0, h = bw(x)) {
@@ -153,44 +313,23 @@ wg_counts <- tmp |>
 
 names(wg_counts) <- group_keys(tmp) |> pull(wordtype)
 
-tmp <- asd_cdi_counts |>
-    filter(wordtype == "total") |>
-    pull(nproduced)
-
-kernal_density_estimate(
-    x = wg_counts$total,
-    t = tmp
-)|>
-plot(tmp, y = _)
-
-
-
-asd_cdi_counts |>
-    pivot_wider(
-        id_cols = c(subjectkey:form, wordtype),
-        names_from = wordset,
-        names_prefix = "n_",
-        values_from = nproduced
+asd_cdi_counts_wg <- asd_cdi_counts_wg |>
+    group_by(wordtype) |>
+    mutate(
+        kde = kernal_density_estimate(pproduced, pproduced)
     ) |>
-    left_join(rename(count_wordtype, wordtype_max = n)) |>
-    left_join(select(filter(count_wordtype, form == "WG"), wordtype, wordtype_max_wg = n)) |>
-    filter(
-        n_ws <= wordtype_max_wg,
-        form == "WS"
-    ) |>
-    ggplot(aes(x = n_ws, y = n_wg, color = wordtype)) +
-    geom_point(color = "black") +
-    geom_smooth() +
-    geom_abline(slope = 1, intercept = 0) +
-    facet_wrap(vars(wordtype), scales = "free") +
-    theme_bw() +
-    theme(legend.position = "none")
+    ungroup()
 
-asd_cdi_ws |>
-    filter(nproduced_ws <= n_wg) |>
-    ggplot(aes(x = nproduced_ws, y = nproduced_wg / nproduced_ws)) +
-    geom_point() +
-    geom_smooth() +
-    xlim(c(0, n_wg)) +
-    ylim(c(0, 1))
+asd_cdi_counts_wg |>
+    ggplot(aes(x = pproduced, y = kde, color = pred_error_rate)) +
+        geom_line(linewidth = 2, lineend = "round") +
+        scale_color_binned(type = "viridis") +
+        theme_bw() +
+        xlab("Proportion of Words Produced") +
+        facet_wrap(vars(wordtype))
+
+
+sd_cdi_counts_wg |>
+    group_by(wordtype) |>
+    summarize()
 
