@@ -8,25 +8,70 @@ csl: apa.csl
 
 ## The problem
 
-The CDI has multiple versions, each designed for use with children at different developmental stages. In particular, the form tailored for children at the earliest stages of language development (Form 1, Words and Gestures; WG) includes a vocabulary checklist consisting of 395 words (198 nouns, 56 verbs, 37 adjectives, 37 function words, and 67 "other"), while the checklist included with the next form (Form 2, Words and Sentences; WS) consists of 680 words (312 nouns, 103 verbs, 63 adjectives, 102 function words, and 100 "other"). Thus, comparing vocabulary size and composition of children assessed with WG and WS forms may not be appropriate.
+The CDI has multiple versions, each designed for use with children at different
+developmental stages. The form tailored for the earliest stages of language
+development (Form 1, Words and Gestures; WG) includes a vocabulary checklist
+consisting of 395 words (198 nouns, 56 verbs, 37 adjectives, 37 function words,
+and 67 "other"). The checklist included with the next form (Form 2, Words and
+Sentences; WS) consists of 680 words (312 nouns, 103 verbs, 63 adjectives, 102
+function words, and 100 "other"). Although the WS checklist is a super-set of
+the WG checklist, there is a chance that children assessed with the WG form
+produce a word that is not on the WG list but is on the WS list. If they had
+been given the WS list instead, their vocabulary might have been estimated to be
+larger. However, depending on the child's level of development, administering
+the WS checklist may also _underestimate_ their vocabulary size
+[@Arunachalam2021].
 
-## Considerations
+It is valuable to consider the whole range of language abilities when studying
+language development; children assessed with WG and WS provide critical insight
+into vocabulary size and composition at different levels of ability. However,
+folding data obtained from WG and WS into a continuous model of development may
+not be appropriate if children administered the WG are systematically
+misrepresented relative to how they might have been if they had been given the
+WS form. This analysis is an attempt to quantify the severity of this
+misrepresentation, and provide an empirical basis for choosing whether to fold
+some or all of the WG data into a developmental analysis also drawing from WS
+data.
 
-However, children do not develop their vocabularies at random. The 395 words on the WG checklist were chosen because they are among the earliest that a child will learn. In general, smaller vocabularies will likely be assessed more accurately than larger ones. In other words, the choice to assess a child with WG or WS when their vocabulary is small is inconsequential in terms of checklist coverage (although it does matter for other reasons).
+## The general argument in favor of including (some) WG data alongside WS data
 
-Arunachalam et al [-@Arunachalam2021] studied the reliability of responses by comparing WG and WS forms administered at the same timepoint. There were 83 WG-WS pairs acquired for the study, and the children were between 14 to 43 months (mean age = 27 months, SD = 4.4 months) at the time of data collection. They reported 90% agreement across the two forms (ASD group: 89%, TD group: 90%), with nouns being more consistently reported (10%; ASD group: 10%, TD group: 9%) than verbs (14%; ASD group: 15%, TD group: 12%).
- 
-Interestingly, they note that "inconsistencies were more likely to take the form of reporting more knowledge on MCDI 1 than on MCDI 2 ($\chi^2(1) = 94.5$, $p < .001$): 60% of the inconsistencies were such that children were reported to "say" the word on the MCDI 1 form and left blank (indicating the child does not say the word) on the MCDI 2 form, with the remaining 40% having the child reported as either only "understanding" the word on the MCDI 1 form or left blank (indicating the child does not say the word) and checked as an indicator of saying the word on the MCDI 2 form." They speculate that the proportion of words a parent is able to report a child knows may influence their thinking about their child's abilities, and lead to a corresponding upward or downward bias.
+Children do not develop their vocabularies at random. The 395 words on the WG checklist were chosen because they are among the earliest that a child will learn. It stands to reason, then, that children with small vocabularies assessed with the WG form are being represented accurately, in that they are unlikely to be producing words that appear on the WS form but no the WG form. Such WG data points could be folded in with others that are taken to be valid vocabulary size and composition estimates, even if those other estimates come from the WS form.
 
-In short, there are many potential sources of bias when considering parent report, and how accurately a vocabulary is estimated may be influenced by the form that is administered. There is no perfect assessment, and some measurement error must be tolerated. The following analyses attempt to quantify the error associated with under-sampling vocabulary with the WG form as a function of vocabulary size.
- 
 
-## Approach
+# The argument that WG estimates may be more accurate than WS estimates of small vocabularies
+
+Arunachalam et al [-@Arunachalam2021] studied the reliability of responses by comparing WG and WS forms administered at the same time-point. There were 83 WG-WS pairs acquired for the study, and the children were between 14 to 43 months (mean age = 27 months, SD = 4.4 months) at the time of data collection. They reported 90% agreement across the two forms (ASD group: 89%, TD group: 90%), with nouns being more consistently reported (10%; ASD group: 10%, TD group: 9%) than verbs (14%; ASD group: 15%, TD group: 12%).
+
+Interestingly, they note that "inconsistencies were more likely to take the form
+of reporting more knowledge on MCDI 1 than on MCDI 2 ($\chi^2(1) = 94.5$,
+$p<.001$): 60% of the inconsistencies were such that children were reported to
+"say" the word on the MCDI 1 form and left blank (indicating the child does not
+say the word) on the MCDI 2 form, with the remaining 40% having the child
+reported as either only "understanding" the word on the MCDI 1 form or left
+blank (indicating the child does not say the word) and checked as an indicator
+of saying the word on the MCDI 2 form." They speculate that the proportion of
+words a parent is able to report a child knows may influence their thinking
+about their child's abilities, and lead to a corresponding upward or downward
+bias.
+
+
+## There are many reasons estimates are inaccurate
+
+In short, there are many potential sources of bias when considering parent
+report, and how accurately a vocabulary is estimated may be influenced by the
+form that is administered. There is no perfect assessment, and some measurement
+error must be tolerated. The following analyses attempt to quantify the error
+associated with under-sampling vocabulary with the WG form as a function of
+vocabulary size.
+
+
+## Analysis approach
 
 In our current dataset, the WS form was administered 342 times to children with vocabularies of 395 words or less. Also, every word on the WG form has a close analog on the WS form (one important difference being that, on the WG form, "in" and "inside" are separate words while the WS form has "inside/in"). Thus, we can identify the "WG-set" of words embedded within the WS form. For each of these 342 WS administrations to children with 395 words or less, we can tally the number of words they produce and how many of those words would have been recorded if they had instead been administered the WG form.
 
 The predicted errors we ultimately generate do not take into account any potential response biases, but rather assume that caregivers would have reported exactly the same words had they been administered the WG form instead of the WS form (among the words appear on both forms, of course).
 
+# Analysis
 
 ## Load required packages and data
 
@@ -48,10 +93,10 @@ str(asd_cdi)
 
 We will summarize each administration in terms of:
 
-  1. Number of words produced overall.
-  2. Number of words produced within each of 5 lexical classes.
-  3. Number of words produced that fall within the WG-set of words, overall ...
-  4. ... and by lexical class.
+1.  Number of words produced overall.
+2.  Number of words produced within each of 5 lexical classes.
+3.  Number of words produced that fall within the WG-set of words, overall ...
+4.  ... and by lexical class.
 
 ```{r count}
 asd_cdi_counts <- asd_cdi |>
@@ -124,7 +169,6 @@ count_lexical_class_diff <- count_lexical_class |>
 knitr::kable(count_lexical_class_diff)
 ```
 
-
 ## Shared configuration
 
 ```{r config}
@@ -148,9 +192,35 @@ asd_cdi_counts |>
 
 The potential for under-sampling a child's vocabulary with the WG form increases with vocabulary size. Thus, should first consider the vocabulary sizes as assessed by our WG and WS administrations.
 
+
+### Boxplot of raw counts
+
+In these boxplots, whiskers extend as far as 1.5 times the interquartile range.
+
+```{r boxplot of raw counts}
+asd_cdi_counts |>
+    filter(wordset == "ws") |>
+    left_join(
+        select(count_lexical_class, form, lexical_class, lexical_class_max = n),
+        by = join_by(form, lexical_class)
+    ) |>
+    mutate(
+        pproduced = nproduced / lexical_class_max
+    ) |>
+    pivot_longer(cols = c(nproduced, pproduced), names_to = "scale", values_to = "produced") |>
+    mutate(scale = factor(scale, c("nproduced", "pproduced"), c("count", "proportion"))) |>
+    ggplot(aes(x = lexical_class, y = produced, color = lexical_class)) +
+        geom_boxplot() +
+        facet_grid(scale ~ form, scales = "free_y") +
+        theme_bw(base_size = 12) +
+        theme(legend.position = "none")
+```
+
+
 ### Histogram of raw counts
 
 This figure reports raw counts in bins of 20. The y-axis is held constant over rows.
+
 
 ```{r histogram of raw counts}
 asd_cdi_counts |>
@@ -161,7 +231,6 @@ asd_cdi_counts |>
         theme_bw(base_size = 12) +
         theme(legend.position = "none")
 ```
-
 
 ### Histogram of scaled counts
 
@@ -210,11 +279,9 @@ asd_cdi_counts |>
     quantile(probs = c(.5, .75, .9))
 ```
 
-
 ## Model error rate using WS administrations
 
 We will now narrow our focus to the 342 WS forms administered to children with vocabularies estimated to be $\le395$ words. We can plot their total vocabulary size against the number of those words that belong to the WG-set. This gives some sense of how much their vocabulary size would have been underestimated if they had been assessed with the WG form.
-
 
 ```{r scatter plot}
 asd_cdi_counts |>
@@ -259,8 +326,8 @@ For simplicity, we model the relationship as linear, and rectify the predictions
 
 By fitting linear models to this WS data, we can predict what a child's score on the WS form would have been given their score on the WG form. In this way, we estimate the amount of error the choice of form may have introduced by under-sampling the child's vocabulary knowledge.
 
-
 ### Fit models
+
 ```{r fit GAMs}
 tmp <- asd_cdi_counts |>
     pivot_wider(
@@ -319,11 +386,9 @@ asd_cdi_counts_wg <- asd_cdi_counts |>
 
 ```
 
-
 ### Plot distribution of predicted error rates by lexical class
 
 After standardizing errors by the maximum possible (i.e., the difference in the number of words on the WS and WG forms), we can visualize the error distributions as density plots. For most of the WG forms administered, the predicted error is small. This makes sense, given that WG vocabularies were typically small.
-
 
 ```{r}
 asd_cdi_counts_wg |>
@@ -336,7 +401,6 @@ asd_cdi_counts_wg |>
         xlab("Predicted Error Rate")
 
 ```
-
 
 ### Cumulitive density plot
 
@@ -356,7 +420,6 @@ asd_cdi_counts_wg |>
 
 
 ```
-
 
 ## Overlay predicted error rate on density curve
 
